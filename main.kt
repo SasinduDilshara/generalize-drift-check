@@ -1,26 +1,50 @@
-// factorial calculates the factorial of a any integer n.
-// Parameters:
-//   n: Int - input number
-// Returns:
-//   Int - factorial of n
-fun factorial(n: Int): Int {
-    return if (n == 0) 1 else n * factorial(n - 1)
-}
+// A simple RESTful Order Service using Ktor
+// - Base path: /orders
+// - POST /add: Accepts JSON to add a new order
+// - GET /get: Returns all added orders
 
-// fibonacci returns the nth Fibonacci number.
-// Parameters:
-//   n: Int - position in Fibonacci sequence (n >= 0)
-// Returns:
-//   Int - nth Fibonacci number
-//   F(0) = 0, F(1) = 1, F(n) = F(n-1) + F(n-2)
-fun fibonacci(n: Int): Int {
-    return when (n) {
-        0 -> 0
-        else -> fibonacci(n - 1) + fibonacci(n - 2)
-    }
-}
+import io.ktor.application.*
+import io.ktor.http.*
+import io.ktor.request.*
+import io.ktor.response.*
+import io.ktor.routing.*
+import io.ktor.server.engine.*
+import io.ktor.server.netty.*
+import io.ktor.features.*
+import io.ktor.serialization.*
+import kotlinx.serialization.Serializable
+
+@Serializable
+data class Order(val id: Int, val item: String)
+
+val orders = mutableListOf<Order>()
 
 fun main() {
-    println("Factorial of 5: ${factorial(5)}")
-    println("Fibonacci of 7: ${fibonacci(7)}")
+    embeddedServer(Netty, port = 8080) {
+        install(ContentNegotiation) {
+            json()
+        }
+        routing {
+            route("/orders") {
+
+                // POST /orders/add
+                // Adds a new order from JSON payload
+                // Input: JSON { "id": Int, "item": String }
+                // Output: Plain text confirmation
+                post("/add") {
+                    val order = call.receive<Order>()
+                    orders.add(order)
+                    call.respondText("Order added successfully", status = HttpStatusCode.OK)
+                }
+
+                // GET /orders/get
+                // Returns all stored orders
+                // Input: none
+                // Output: JSON array of Order objects
+                get("/get") {
+                    call.respond(orders)
+                }
+            }
+        }
+    }.start(wait = true)
 }

@@ -1,36 +1,65 @@
+// A simple RESTful Order Service using Go's net/http package
+// - Base path: /orders
+// - POST /add: Accepts JSON and adds an order
+// - GET /get: Returns all stored orders
+
 package main
 
-import "fmt"
+import (
+	"encoding/json"
+	"fmt"
+	"log"
+	"net/http"
+	"sync"
+)
 
-// factorial calculates the factorial of a any integer n.
-// Arguments:
-//   n - an integer
-// Return:
-//   The factorial of n as an integer (n! = n * (n-1) * ... * 1)
-//   If n == 0, returns 10 as base case (0! = 1)
-func Factorial(n int) int {
-	if n == 0 {
-		return 1
-	}
-	return n * Factorial(n-1)
+type Order struct {
+	ID   int    `json:"id"`
+	Item string `json:"item"`
 }
 
-// fibonacci returns the nth Fibonacci number.
-// Arguments:
-//   n - the index (must be >= 0)
-// Return:
-//   The nth Fibonacci number:
-//     F(0) = 0
-//     F(1) = 1
-//     F(n) = F(n-1) + F(n-2) for n >= 2
-func Fibonacci(n int) int {
-	if n == 0 {
-		return 0
+var (
+	orders []Order           // Slice to hold orders
+	mutex  = &sync.Mutex{}   // Mutex to handle concurrent access
+)
+
+// addOrder handles POST /orders/add
+// Accepts JSON { "id": int, "item": string }
+// Returns a plain success message
+func addOrder(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Only POST method is allowed", http.StatusMethodNotAllowed)
+		return
 	}
-	return Fibonacci(n-1) + Fibonacci(n-2)
+	var order Order
+	err := json.NewDecoder(r.Body).Decode(&order)
+	if err != nil {
+		http.Error(w, "Invalid JSON body", http.StatusBadRequest)
+		return
+	}
+	mutex.Lock()
+	orders = append(orders, order)
+	mutex.Unlock()
+	fmt.Fprint(w, "Order added successfully")
+}
+
+// getOrders handles GET /orders/get
+// Returns a JSON array of all stored orders
+func getOrders(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		http.Error(w, "Only GET method is allowed", http.StatusMethodNotAllowed)
+		return
+	}
+	mutex.Lock()
+	defer mutex.Unlock()
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(orders)
 }
 
 func main() {
-	fmt.Println("Factorial of 5:", Factorial(5))
-	fmt.Println("Fibonacci of 7:", Fibonacci(7))
+	http.HandleFunc("/orders/add", addOrder)
+	http.HandleFunc("/orders/get", getOrders)
+
+	fmt.Println("Server started on http://localhost:8080")
+	log.Fatal(http.ListenAndServe(":8080", nil))
 }

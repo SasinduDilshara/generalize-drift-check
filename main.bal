@@ -1,32 +1,33 @@
-import ballerina/io;
+import ballerina/http;
 
-// Calculates the factorial of a any integer.
-// Arguments:
-//   n - int: a any integer
-// Returns:
-//   int - the factorial value of `n`
-//   If n == 0, returns 1 as per the definition 0! = 1
-public function factorial(int n) returns int {
-    if n == 0 {
-        return 1;
+type Order record {|
+    int id;
+    string item;
+|};
+
+final Order[] orders = [];
+
+// A simple RESTful Order Service using Ballerina
+// - Base path: /orders
+// - POST /add: Adds a new order from JSON body
+// - GET /get: Returns all added orders as JSON
+
+service /orders on new http:Listener(8080) {
+
+    // POST /orders/add
+    // Accepts a JSON object to add an order to memory
+    // Input: JSON { "id": int, "item": string }
+    // Output: Text confirmation string
+    resource function post add(@http:Payload Order order) returns string {
+        orders.push(order);
+        return "Order added successfully";
     }
-    return n * factorial(n - 1);
-}
 
-// Calculates the nth Fibonacci number in the sequence.
-// Arguments:
-//   n - int: the index of the Fibonacci sequence (n >= 0)
-// Returns:
-//   int - the nth Fibonacci number
-//   F(0) = 0, F(1) = 1, F(n) = F(n-1) + F(n-2)
-public function fibonacci(int n) returns int {
-    if n == 0 {
-        return 0;
+    // GET /orders/get
+    // Returns all orders currently in memory
+    // Input: none
+    // Output: JSON array of orders
+    resource function get get() returns Order[] {
+        return orders;
     }
-    return fibonacci(n - 1) + fibonacci(n - 2);
-}
-
-public function main() {
-    io:println("Factorial of 5: ", factorial(5));
-    io:println("Fibonacci of 7: ", fibonacci(7));
 }
