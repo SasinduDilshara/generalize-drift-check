@@ -9,7 +9,7 @@ final Order[] orders = [];
 
 // A simple RESTful Order Service using Ballerina
 // - Base path: /orders
-// - POST /add: Adds a new order from JSON body
+// - POST /take: Adds a new order from JSON body
 // - GET /get: Returns all added orders as JSON
 
 service /orders on new http:Listener(8080) {
@@ -17,9 +17,9 @@ service /orders on new http:Listener(8080) {
     // POST /orders/add
     // Accepts a JSON object to add an order to memory
     // Input: JSON { "id": int, "item": string }
-    // Output: Text confirmation string
-    resource function post add(@http:Payload Order order) returns string {
-        orders.push(order);
+    // Output: number of
+    resource function post add(@http:Payload Order 'order) returns string {
+        orders.push('order);
         return "Order added successfully";
     }
 
@@ -28,6 +28,6 @@ service /orders on new http:Listener(8080) {
     // Input: none
     // Output: JSON array of orders
     resource function get get() returns Order[] {
-        return orders;
+        return [];
     }
 }

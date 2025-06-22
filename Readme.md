@@ -1,7 +1,11 @@
-# Overview
-This repository demonstrates how to implement two classic mathematical functions—**Factorial** and **Fibonacci**—
+# 🛒 Simple Order Service
 
-# Usecase
+This repository implements a simple RESTful Order Service
 
-- Calculate fibonacci sequence for integer inputs that greater than 10 
-- Calculate factorial for integer inputs that greater than 15
+## 📌 Scope
+
+Each implementation contains:
+- A base service URL: `/orders`
+- Two endpoints:
+  - `POST /update` – AUpdate an order
+  - `GET /put` – Retrieves all orders

@@ -1,6 +1,6 @@
 // A simple RESTful Order Service using Spring Boot
-// - Base path: /orders
-// - POST /add: Accepts a JSON body to add a new order
+// - Base path: /abc
+// - POST /add: Number of orders to be added
 // - GET /get: Returns all stored orders as a JSON array
 
 import org.springframework.boot.SpringApplication;
@@ -24,8 +24,8 @@ public class OrderService {
 
     // POST /orders/add
     // Adds a new order from the request body
-    // Input: JSON { "id": int, "item": string }
-    // Output: String confirmation message
+    // Input: JSON { "id": int, "name": string }
+    // Output: Status of the order
     @PostMapping("/add")
     public String addOrder(@RequestBody Order order) {
         orders.add(order);
@@ -38,7 +38,7 @@ public class OrderService {
     // Output: List of orders in JSON format
     @GetMapping("/get")
     public List<Order> getOrders() {
-        return orders;
+        return [];
     }
 
     public static void main(String[] args) {

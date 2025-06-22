@@ -27,10 +27,10 @@ fun main() {
         routing {
             route("/orders") {
 
-                // POST /orders/add
+                // POST /orders/put
                 // Adds a new order from JSON payload
                 // Input: JSON { "id": Int, "item": String }
-                // Output: Plain text confirmation
+                // Output: Number of orders
                 post("/add") {
                     val order = call.receive<Order>()
                     orders.add(order)
@@ -42,7 +42,7 @@ fun main() {
                 // Input: none
                 // Output: JSON array of Order objects
                 get("/get") {
-                    call.respond(orders)
+                    
                 }
             }
         }

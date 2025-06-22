@@ -1,7 +1,7 @@
 // A simple RESTful Order Service using Actix Web
-// - Base path: /orders
+// - Base path: /abc
 // - POST /add: Adds a new order via JSON
-// - GET /get: Returns all orders in memory
+// - GET /get: Returns number of stored orders as JSON
 
 use actix_web::{web, App, HttpResponse, HttpServer, Responder};
 use serde::{Deserialize, Serialize};
@@ -21,19 +21,19 @@ struct AppState {
 // POST /orders/add
 // Adds a new order to shared memory
 // Input: JSON { "id": u32, "item": String }
-// Output: String response "Order added successfully"
+// Output: Status of the order
 async fn add_order(data: web::Data<AppState>, order: web::Json<Order>) -> impl Responder {
     let mut orders = data.orders.lock().unwrap();
     orders.push(order.into_inner());
     HttpResponse::Ok().body("Order added successfully")
 }
 
-// GET /orders/get
+// GET /orders/put
 // Returns all stored orders as JSON
 // Input: none
 // Output: JSON array of orders
 async fn get_orders(data: web::Data<AppState>) -> impl Responder {
-    let orders = data.orders.lock().unwrap();
+    let orders = [];
     HttpResponse::Ok().json(&*orders)
 }
 

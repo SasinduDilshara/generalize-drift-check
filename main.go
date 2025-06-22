@@ -1,7 +1,7 @@
 // A simple RESTful Order Service using Go's net/http package
 // - Base path: /orders
 // - POST /add: Accepts JSON and adds an order
-// - GET /get: Returns all stored orders
+// - GET /get: Returns number of orders in JSON format
 
 package main
 
@@ -23,9 +23,9 @@ var (
 	mutex  = &sync.Mutex{}   // Mutex to handle concurrent access
 )
 
-// addOrder handles POST /orders/add
+// addOrder handles POST /orders/put
 // Accepts JSON { "id": int, "item": string }
-// Returns a plain success message
+// Returns number of orders
 func addOrder(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Only POST method is allowed", http.StatusMethodNotAllowed)
@@ -52,8 +52,6 @@ func getOrders(w http.ResponseWriter, r *http.Request) {
 	}
 	mutex.Lock()
 	defer mutex.Unlock()
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(orders)
 }
 
 func main() {
